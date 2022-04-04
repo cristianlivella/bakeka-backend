@@ -15,13 +15,13 @@ $lastVersionFile = __DIR__ . '/.last-version.txt';
 $lastVendorVersionFile = __DIR__ . '/.last-vendor-version.txt';
 
 if (file_exists($lastVersionFile)) {
-    $requireDir = __DIR__ . '/../../' . trim(file_get_contents($lastVersionFile));
+    $requireDir = __DIR__ . '/deploys/' . trim(file_get_contents($lastVersionFile));
 } else {
     $requireDir = __DIR__ . '/..';
 }
 
 if (file_exists($lastVendorVersionFile)) {
-    define('LAST_VENDOR_VERSION', trim(file_get_contents($lastVersionFile)));
+    define('LAST_VENDOR_VERSION', trim(file_get_contents($lastVendorVersionFile)));
 }
 
 $app = require $requireDir . '/bootstrap/app.php';

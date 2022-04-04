@@ -48,10 +48,10 @@ jobs:
         remoteDir: "${{ secrets.FTP_DIR }}/deploys/${{ env.TIMESTAMP }}"
         options: "-v --delete -x ^.env ${{ (env.UPDATE_COMPOSER == 'false') && '-x ^vendor/' || '' }}"
     - name: Create version file tag
-      run: "mkdir -p .public_deploy && echo ${{ env.TIMESTAMP }} > .public_deploy/last-version.txt"
+      run: "mkdir -p .public_deploy && echo ${{ env.TIMESTAMP }} > .public_deploy/.last-version.txt"
     - name: Create vendor version file tag
       if: ${{ env.UPDATE_COMPOSER == 'true' }}
-      run: "echo ${{ env.TIMESTAMP }} > .public_deploy/last-vendor-version.txt"
+      run: "echo ${{ env.TIMESTAMP }} > .public_deploy/.last-vendor-version.txt"
     - name: Prepare public directory for deploy
       if: ${{ env.UPDATE_PUBLIC == 'true' }}
       run: "cp -a public/. .public_deploy/"
