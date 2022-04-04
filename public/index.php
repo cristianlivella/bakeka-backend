@@ -39,7 +39,7 @@ $requireDir = (function() {
         $key = $_GET['key'];
         $newVersion = substr(preg_replace("/[^0-9a-f]+/", "", $_GET['new_version']), 0, 10);
 
-        if ($lastVendorVersion = $getFileContent($lastVendorVersionFile) || $lastVendorVersion = $getFileContent($lastVendorVersionFile . 'old')) {
+        if (!($lastVendorVersion = $getFileContent($lastVendorVersionFile) || $lastVendorVersion = $getFileContent($lastVendorVersionFile . 'old'))) {
             $exitWithStatusCode(500);
         }
 
