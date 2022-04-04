@@ -1,6 +1,6 @@
 <?php
 
-/*
+/* 
 |--------------------------------------------------------------------------
 | Create The Application
 |--------------------------------------------------------------------------
@@ -19,7 +19,7 @@ $requireDir = (function() {
             if (!$isOldFile) {
                 file_put_contents($path . '.old', $content);
             }
-            
+
             return $content;
         }
 
