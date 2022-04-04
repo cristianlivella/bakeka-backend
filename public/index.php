@@ -11,18 +11,69 @@
 |
 */
 
-$lastVersionFile = __DIR__ . '/.last-version.txt';
-$lastVendorVersionFile = __DIR__ . '/.last-vendor-version.txt';
+$requireDir = (function() {
+    $getFileContent = function($path) {
+        if (file_exists($path) && ($content = trim(file_get_contents($path))) !== '') {
+            return $content;
+        }
 
-if (file_exists($lastVersionFile)) {
-    $requireDir = __DIR__ . '/deploys/' . trim(file_get_contents($lastVersionFile));
-} else {
-    $requireDir = __DIR__ . '/..';
-}
+        return null;
+    };
 
-if (file_exists($lastVendorVersionFile)) {
-    define('LAST_VENDOR_VERSION', trim(file_get_contents($lastVendorVersionFile)));
-}
+    $exitWithStatusCode = function($statusCode) {
+        http_response_code($statusCode);
+        exit;
+    };
+
+    $lastVersionFile = __DIR__ . '/.last-version.txt';
+    $lastVendorVersionFile = __DIR__ . '/.last-vendor-version.txt';
+
+    if ($lastVersion = $getFileContent($lastVersionFile) || $lastVersion = $getFileContent($lastVersionFile . '.old')) {
+        $requireDir = __DIR__ . '/deploys/' . $lastVersion;
+    } else {
+        $requireDir = __DIR__ . '/..';
+    }
+
+    // TODO: get key from .env
+    if (isset($_GET['copy_vendor']) && isset($_GET['new_version']) && isset($_GET['key'])) {
+        $key = $_GET['key'];
+        $newVersion = substr(preg_replace("/[^0-9a-f]+/", "", $_GET['new_version']), 0, 10);
+
+        if ($lastVendorVersion = $getFileContent($lastVendorVersionFile) || $lastVendorVersion = $getFileContent($lastVendorVersionFile . 'old')) {
+            $exitWithStatusCode(500);
+        }
+
+        // TODO: use real key (from .env)
+        if ($key !== 'key') {
+            $exitWithStatusCode(401);
+        }
+
+        if (!is_dir(__DIR__ . '/deploys/' . $newVersion)) {
+            $exitWithStatusCode(400);
+        }
+
+        $sourceDir = __DIR__ . '/deploys/' . $lastVendorVersion;
+        $destinationDir = __DIR__ . '/deploys/' . $newVersion;
+
+        mkdir($destinationDir, 0755);
+
+        foreach (
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($sourceDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST) as $item
+        ) {
+            if ($item->isDir()) {
+                mkdir($destinationDir . '/' . $iterator->getSubPathname());
+            } else {
+                copy($item, $destinationDir . '/' . $iterator->getSubPathname());
+            }
+        }
+
+        $exitWithStatusCode(200);
+    }
+
+    return $requireDir;
+})();
 
 $app = require $requireDir . '/bootstrap/app.php';
 

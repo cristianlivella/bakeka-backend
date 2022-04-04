@@ -1,12 +1,6 @@
 <?php
 
-if (defined('LAST_VENDOR_VERSION')) {
-    $requireDir = __DIR__ . '/../../' . LAST_VENDOR_VERSION;
-} else {
-    $requireDir = __DIR__ . '/..';
-}
-
-require_once $requireDir . '/vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
     dirname(__DIR__)
