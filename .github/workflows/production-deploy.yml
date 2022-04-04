@@ -47,6 +47,11 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         remoteDir: "${{ secrets.FTP_DIR }}/deploys/${{ env.TIMESTAMP }}"
         options: "-v --delete -x ^.env ${{ (env.UPDATE_COMPOSER == 'false') && '-x ^vendor/' || '' }}"
+    - name: Copy old vendor
+      if: ${{ env.UPDATE_COMPOSER == 'false' }}
+      uses: wei/curl@master
+      with:
+        args: "${{ secrets.API_URL }}/?copy_vendor&new_version=${{ env.TIMESTAMP }}&key=key"
     - name: Create version file tag
       run: "mkdir -p .public_deploy && echo ${{ env.TIMESTAMP }} > .public_deploy/.last-version.txt"
     - name: Create vendor version file tag
