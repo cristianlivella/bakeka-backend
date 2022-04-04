@@ -12,9 +12,19 @@
 */
 
 $requireDir = (function() {
-    $getFileContent = function($path) {
+    $getFileContent = function($path) use (&$getFileContent) {
+        $isOldFile = substr($path, -4) !== '.old';
+
         if (file_exists($path) && ($content = trim(file_get_contents($path))) !== '') {
+            if (!$isOldFile) {
+                file_put_contents($path . '.old', $content);
+            }
+            
             return $content;
+        }
+
+        if ($isOldFile) {
+            return $getFileContent($path . '.old');
         }
 
         return null;
@@ -28,7 +38,7 @@ $requireDir = (function() {
     $lastVersionFile = __DIR__ . '/.last-version.txt';
     $lastVendorVersionFile = __DIR__ . '/.last-vendor-version.txt';
 
-    if ($lastVersion = $getFileContent($lastVersionFile) || $lastVersion = $getFileContent($lastVersionFile . '.old')) {
+    if ($lastVersion = $getFileContent($lastVersionFile)) {
         $requireDir = __DIR__ . '/deploys/' . $lastVersion;
     } else {
         $requireDir = __DIR__ . '/..';
@@ -39,7 +49,7 @@ $requireDir = (function() {
         $key = $_GET['key'];
         $newVersion = substr(preg_replace("/[^0-9a-f]+/", "", $_GET['new_version']), 0, 10);
 
-        if (!($lastVendorVersion = $getFileContent($lastVendorVersionFile) || $lastVendorVersion = $getFileContent($lastVendorVersionFile . 'old'))) {
+        if (!($lastVendorVersion = $getFileContent($lastVendorVersionFile))) {
             $exitWithStatusCode(500);
         }
 
@@ -52,8 +62,8 @@ $requireDir = (function() {
             $exitWithStatusCode(400);
         }
 
-        $sourceDir = __DIR__ . '/deploys/' . $lastVendorVersion;
-        $destinationDir = __DIR__ . '/deploys/' . $newVersion;
+        $sourceDir = __DIR__ . '/deploys/' . $lastVendorVersion . '/vendor';
+        $destinationDir = __DIR__ . '/deploys/' . $newVersion . '/vendor';
 
         mkdir($destinationDir, 0755);
 
