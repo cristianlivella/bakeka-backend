@@ -13,7 +13,7 @@
 
 $requireDir = (function() {
     $getFileContent = function($path) use (&$getFileContent) {
-        $isOldFile = substr($path, -4) !== '.old';
+        $isOldFile = substr($path, -4) === '.old';
 
         if (file_exists($path) && ($content = trim(file_get_contents($path))) !== '') {
             if (!$isOldFile) {
@@ -44,7 +44,6 @@ $requireDir = (function() {
         $requireDir = __DIR__ . '/..';
     }
 
-    // TODO: get key from .env
     if (isset($_GET['copy_vendor']) && isset($_GET['new_version']) && isset($_GET['key'])) {
         $key = $_GET['key'];
         $newVersion = substr(preg_replace("/[^0-9a-f]+/", "", $_GET['new_version']), 0, 10);
