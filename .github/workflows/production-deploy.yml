@@ -51,7 +51,7 @@ jobs:
       if: ${{ env.UPDATE_COMPOSER == 'false' }}
       uses: wei/curl@master
       with:
-        args: "${{ secrets.API_URL }}/?copy_vendor&new_version=${{ env.TIMESTAMP }}&key=key"
+        args: "${{ secrets.API_URL }}/?copy_vendor\\&new_version=${{ env.TIMESTAMP }}\\&key=key"
     - name: Create version file tag
       run: "mkdir -p .public_deploy && echo ${{ env.TIMESTAMP }} > .public_deploy/.last-version.txt"
     - name: Create vendor version file tag
